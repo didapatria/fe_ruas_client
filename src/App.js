@@ -10,6 +10,8 @@ function App() {
   const [faceDetected, setFaceDetected] = useState(false);
   const [faceCoordinates, setFaceCoordinates] = useState([]);
   const [error, setError] = useState(null);
+  const [menyontek, setMenyontek] = useState(false);
+  const [countCheat, setCountCheat] = useState([]);
 
   useEffect(() => {
     let model;
@@ -19,7 +21,7 @@ function App() {
       model = await load();
 
       // Memulai proses deteksi wajah secara berulang setiap 500ms
-      setInterval(processVideo, 500);
+      setInterval(processVideo, 2000);
     }
 
     async function processVideo() {
@@ -70,7 +72,20 @@ function App() {
 
       if (response && response.data && response.data.faces) {
         setFaceCoordinates(response.data.faces);
-        console.log("Response:", response.data);
+        if (response.data.faces[0]) {
+          setCountCheat(response.data.faces[0].count_cheat);
+          console.log(response.data.faces[0].count_cheat);
+
+          let cheating = response.data.faces[0].count_cheat;
+
+          if (
+            cheating["tengok"] > 20 ||
+            cheating["depanBelakang"] > 20 ||
+            cheating["atasBawah"] > 20
+          ) {
+            setMenyontek(true);
+          }
+        }
         setError(null);
       } else {
         setError("Terjadi kesalahan dalam respons dari backend.");
@@ -105,8 +120,38 @@ function App() {
           <div className="text-white font-bold text-xl">My App</div>
         </div>
       </nav>
-      <div className="flex justify-center">
-        <Webcam ref={webcamRef} />
+      <div className="flex">
+        <div className="w-2/3">
+          <Webcam ref={webcamRef} className="videoCapture" />
+        </div>
+        <div className="flex-1 ml-5">
+          {countCheat ? (
+            <div>
+              <p>Jumlah terdeteksi melakukan kecurangan</p>
+              <ul>
+                <li>
+                  Tengok Kiri-Kanan: <b>{countCheat["tengok"]}</b> (deteksi
+                  tertinggi: {Number(countCheat["tengokPersen"]).toFixed(2)}%)
+                </li>
+                <li>
+                  Tengok Depan Belakang: <b>{countCheat["depanBelakang"]}</b>{" "}
+                  (deteksi tertinggi:{" "}
+                  {Number(countCheat["depanBelakangPersen"]).toFixed(2)}%)
+                </li>
+                <li>
+                  Lihat Atas Bawah: <b>{countCheat["atasBawah"]}</b> (deteksi
+                  tertinggi: {Number(countCheat["atasBawahPersen"]).toFixed(2)}
+                  %)
+                </li>
+                <li>
+                  Kesimpulan: <b>{menyontek ? "Menyontek" : "Normal"}</b>
+                </li>
+              </ul>
+            </div>
+          ) : (
+            ""
+          )}
+        </div>
       </div>
 
       {faceCoordinates.map((face, index) => (
