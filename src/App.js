@@ -114,9 +114,11 @@ function App() {
 
   return (
     <div>
-      <nav className="bg-gray-800 p-4 w-1/2">
+      <nav className="bg-gray-800 p-4 w-full">
         <div className="container mx-auto flex items-center justify-between">
-          <div className="text-white font-bold text-xl">My App</div>
+          <div className="text-white font-bold text-xl">
+            Ruas (Ruang Pengawas) Ujian - Client
+          </div>
         </div>
       </nav>
       <div className="flex">
