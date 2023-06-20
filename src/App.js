@@ -3,7 +3,6 @@ import Webcam from "react-webcam";
 import * as tf from "@tensorflow/tfjs";
 import { load } from "@tensorflow-models/blazeface";
 import axios from "axios";
-import "./styles.css";
 
 function App() {
   const webcamRef = useRef(null);
