@@ -1,70 +1,92 @@
-# Getting Started with Create React App
+# Ruas (Ruang Pengawas) Ujian - Client
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Welcome to our cutting-edge React application, built using the latest technologies! This repository showcases the use of React JS for creating fast and responsive user interfaces, Tailwind CSS for styling, and Tensorflow JS for incorporating powerful machine learning capabilities. With this powerful combination, we aim to deliver a seamless and delightful experience for our users. Whether you're interested in exploring the codebase, contributing to the project, or just seeing what's possible with these technologies, we invite you to dive in and take a look!
 
-## Available Scripts
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#installation-and-setup-instructions">Installation and Setup Instructions</a>
+      <ul>
+        <li><a href="#create-a-new-react-project-with-yarn">Create a new react project with yarn</a></li>
+        <li><a href="#install-react-dependencies-and-tensorflow">Install React Dependencies and TensorFlow</a></li>
+        <li><a href="#install-tailwind-css-with-prettier-plugin">Install Tailwind CSS with Prettier plugin</a></li>
+        <li><a href="#configure-your-template-paths">Configure your template paths</a></li>
+        <li><a href="#add-the-tailwind-directives-to-your-css">Add the Tailwind directives to your CSS</a></li>
+        <li><a href="#start-your-build-process">Start your build process</a></li>
+      </ul>
+    </li>
+  </ol>
+</details>
 
-In the project directory, you can run:
+<!-- INSTALLATION AND SETUP INSTRUCTIONS -->
 
-### `npm start`
+## Installation and Setup Instructions
+
+### Create a new react project with yarn
+
+Start by creating a new React project with [\***\*Create React App v5.0+\*\***](https://create-react-app.dev/docs/getting-started/) if you don't have one already set up.
+
+```
+yarn create react-app ruas_client
+cd ruas_client
+```
+
+### Install React Dependencies and TensorFlow
+
+Install react dependencies and tensorflow with yarn
+
+```
+yarn add react-redux @reduxjs/toolkit react-router-dom react-webcam axios formik yup http-proxy-middleware @tensorflow/tfjs
+```
+
+### Install Tailwind CSS with Prettier plugin
+
+Install `tailwindcss` with yarn, and then run the init command to generate your `tailwind.config.js` file.
+
+```
+yarn add -D tailwindcss prettier prettier-plugin-tailwindcss
+yarn tailwindcss init -p
+```
+
+### Configure your template paths
+
+Add the paths to all of your template files in your `tailwind.config.js` file.
+
+```
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./src/**/*.{js,jsx,ts,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+### Add the Tailwind directives to your CSS
+
+Add the `@tailwind` directives for each of Tailwind’s layers to your `./src/index.css` file.
+
+```
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+### Start your build process
+
+Run your build process with `yarn start`.
+
+```
+yarn start
+```
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
