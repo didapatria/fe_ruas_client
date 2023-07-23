@@ -1,7 +1,7 @@
 const Intro1 = ({ title, content }) => {
   return (
     <div className="flex m-10 space-x-10 w-full">
-      <div className="w-1/2 flex justify-center items-center bg-slate-200 rounded-3xl aspect-video py-16">
+      <div className="w-1/2 flex justify-center items-center bg-slate-200 rounded-3xl aspect-video py-10 px-5">
         <img src="./assets/images/enable-webcams.png" alt="Enable Webcams" />
       </div>
       <div className="flex-1">
