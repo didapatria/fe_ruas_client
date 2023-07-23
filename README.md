@@ -29,8 +29,8 @@ Welcome to our cutting-edge React application, built using the latest technologi
 Start by creating a new React project with [\***\*Create React App v5.0+\*\***](https://create-react-app.dev/docs/getting-started/) if you don't have one already set up.
 
 ```
-yarn create react-app ruas_client
-cd ruas_client
+yarn create react-app fe_ruas_client
+cd fe_ruas_client
 ```
 
 ### Install React Dependencies and TensorFlow
@@ -38,7 +38,7 @@ cd ruas_client
 Install react dependencies and tensorflow with yarn
 
 ```
-yarn add react-redux @reduxjs/toolkit react-router-dom react-webcam axios formik yup http-proxy-middleware @tensorflow/tfjs
+yarn add react-redux @reduxjs/toolkit react-router-dom react-webcam axios formik yup http-proxy-middleware @tensorflow/tfjs @tensorflow-models/blazeface
 ```
 
 ### Install Tailwind CSS with Prettier plugin
@@ -46,8 +46,21 @@ yarn add react-redux @reduxjs/toolkit react-router-dom react-webcam axios formik
 Install `tailwindcss` with yarn, and then run the init command to generate your `tailwind.config.js` file.
 
 ```
-yarn add -D tailwindcss prettier prettier-plugin-tailwindcss
+yarn add -D tailwindcss prettier prettier-plugin-tailwindcss postcss autoprefixer
 yarn tailwindcss init -p
+```
+
+### Add Tailwind to your PostCSS configuration
+
+Add `tailwindcss` and `autoprefixer` to your `postcss.config.js` file, or wherever PostCSS is configured in your project.
+
+```
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  }
+}
 ```
 
 ### Configure your template paths
