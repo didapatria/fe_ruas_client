@@ -7,7 +7,7 @@ import Intro3 from "./Intro3";
 
 import dataIntro from "../../model/dataIntro";
 
-const Intro = ({ toggleSlide, slide }) => {
+const Intro = () => {
   const [step, setStep] = useState(1);
   const toggleStep = (value) => {
     setStep(value);
@@ -20,19 +20,27 @@ const Intro = ({ toggleSlide, slide }) => {
             key={data.id}
             className={step === data.id ? "flex w-full" : "hidden"}
           >
-            {data.id === 1 ? (
-              <Intro1 title={data.title} content={data.content} />
-            ) : null}
-            {data.id === 2 ? (
-              <Intro2 title={data.title} content={data.content} />
-            ) : null}
-            {data.id === 3 ? (
-              <Intro3
-                title={data.title}
-                subtitle={data.subtitle}
-                content={data.content}
-              />
-            ) : null}
+            {step === data.id && (
+              <>
+                {data.id === 1 && (
+                  <Intro1 title={data.title} content={data.content} />
+                )}
+                {data.id === 2 && (
+                  <Intro2
+                    title={data.title}
+                    subtitle={data.subtitle}
+                    img={data.img}
+                  />
+                )}
+                {data.id === 3 && (
+                  <Intro3
+                    title={data.title}
+                    subtitle={data.subtitle}
+                    content={data.content}
+                  />
+                )}
+              </>
+            )}
           </div>
         ))}
       </div>

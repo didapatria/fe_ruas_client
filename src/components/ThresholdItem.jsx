@@ -13,6 +13,7 @@ const ThresholdItem = ({ label, name }) => {
       <input
         className="text-black px-2"
         type="number"
+        min={0}
         name={name}
         value={threshold}
         onChange={handleThresholdChange}

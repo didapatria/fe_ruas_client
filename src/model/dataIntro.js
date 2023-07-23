@@ -9,12 +9,25 @@ const dataIntro = [
   },
   {
     id: 2,
-    title: "Klasifikasi Object",
-    content: "Terdapat 3 jenis kategori yang akan dideteksi",
+    title: "Daftar Kategori Deteksi",
+    subtitle: "Terdapat 4 jenis kategori yang akan dideteksi",
     img: [
-      { id: 1, category: "Category 1", url: "url_1" },
-      { id: 2, category: "Category 2", url: "url_2" },
-      { id: 3, category: "Category 3", url: "url_3" },
+      {
+        id: 1,
+        category: "Tengok Kiri-Kanan",
+        url: "1-kategori-lirik-kiri-kanan.jpg",
+      },
+      {
+        id: 2,
+        category: "Tengok Depan-Belakang",
+        url: "2-kategori-tengok-depan-belakang.jpg",
+      },
+      {
+        id: 3,
+        category: "Lirik Kiri-Kanan",
+        url: "3-kategori-tengok-kiri-kanan.jpg",
+      },
+      { id: 4, category: "Lihat Atas", url: "4-kategori-lihat-atas.jpg" },
     ],
   },
   {

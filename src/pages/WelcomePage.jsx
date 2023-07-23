@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-import Welcome from "./welcome/Welcome";
-import Intro from "./intro/Index";
+import Welcome from "./welcome";
+import Intro from "./intro";
 
 const WelcomePage = () => {
   const [slide, setSlide] = useState("welcome");
