@@ -27,7 +27,11 @@ const Intro = ({ toggleSlide, slide }) => {
               <Intro2 title={data.title} content={data.content} />
             ) : null}
             {data.id === 3 ? (
-              <Intro3 title={data.title} content={data.content} />
+              <Intro3
+                title={data.title}
+                subtitle={data.subtitle}
+                content={data.content}
+              />
             ) : null}
           </div>
         ))}
