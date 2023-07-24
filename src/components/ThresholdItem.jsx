@@ -1,10 +1,10 @@
-import { useState } from "react";
-
-const ThresholdItem = ({ label, name }) => {
-  const [threshold, setThreshold] = useState(0);
-
+const ThresholdItem = ({ label, name, value, onThresholdChange }) => {
   const handleThresholdChange = (event) => {
-    setThreshold(event.target.value);
+    const newValue =
+      event.target.value === ""
+        ? ""
+        : Math.max(0, parseInt(event.target.value, 10));
+    onThresholdChange(name, newValue); // Call the function from the parent component
   };
 
   return (
@@ -13,10 +13,10 @@ const ThresholdItem = ({ label, name }) => {
       <input
         className="text-black px-2"
         type="number"
-        min={0}
         name={name}
-        value={threshold}
+        value={value || ""} // Provide a default value of an empty string if value is undefined
         onChange={handleThresholdChange}
+        placeholder="0"
       />
     </div>
   );

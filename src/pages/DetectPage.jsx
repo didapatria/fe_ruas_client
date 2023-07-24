@@ -1,16 +1,44 @@
 import { useRef, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import Webcam from "react-webcam";
 import * as tf from "@tensorflow/tfjs";
 import { load } from "@tensorflow-models/blazeface";
 import axios from "axios";
+import dataDetect from "../model/dataDetect";
 
 function DetectPage() {
   const webcamRef = useRef(null);
   const [faceDetected, setFaceDetected] = useState(false);
   const [faceCoordinates, setFaceCoordinates] = useState([]);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [menyontek, setMenyontek] = useState(false);
   const [countCheat, setCountCheat] = useState([]);
+
+  const location = useLocation();
+  const thresholdsFromIntro = location.state;
+
+  useEffect(() => {
+    const isValidThresholds =
+      Array.isArray(thresholdsFromIntro) &&
+      thresholdsFromIntro.length === 4 &&
+      thresholdsFromIntro.every((threshold) => typeof threshold === "number");
+
+    // Threshold
+    console.log("Threshold: ", thresholdsFromIntro);
+
+    if (!isValidThresholds) {
+      setError("Invalid thresholds received from the Intro3 component.");
+      return;
+    }
+
+    // Update the menyontek state whenever thresholdsFromIntro changes
+    if (checkThresholds()) {
+      setMenyontek(true);
+    } else {
+      setMenyontek(false);
+    }
+  }, [countCheat, thresholdsFromIntro]);
 
   useEffect(() => {
     let model;
@@ -19,7 +47,7 @@ function DetectPage() {
       // Memuat model BlazeFace dari TensorFlow.js
       model = await load();
 
-      // Memulai proses deteksi wajah secara berulang setiap 500ms
+      // Memulai proses deteksi wajah secara berulang setiap 1s
       setInterval(processVideo, 1000);
     }
 
@@ -53,8 +81,23 @@ function DetectPage() {
     };
   }, []);
 
+  const checkThresholds = () => {
+    const values = dataDetect.map((data) => countCheat[`${data.name}`]);
+
+    // Menghasilkan array baru dengan hasil perbandingan terhadap ambang batas
+    const results = values.map(
+      (value, index) => value > thresholdsFromIntro[index]
+    );
+
+    return results;
+  };
+
   const sendVideoToBackend = async () => {
     try {
+      setLoading(true);
+      setError(null);
+      setMenyontek(false);
+
       const video = webcamRef.current.getScreenshot();
       const formData = new FormData();
       formData.append("video", dataURItoBlob(video));
@@ -69,20 +112,14 @@ function DetectPage() {
         }
       );
 
+      setLoading(false);
+
       if (response && response.data && response.data.faces) {
         setFaceCoordinates(response.data.faces);
         console.log("logs: ", response.data.faces);
         if (response.data.faces[0]) {
           setCountCheat(response.data.faces[0].count_cheat);
-          console.log(response.data.faces[0].count_cheat);
-
-          let cheating = response.data.faces[0].count_cheat;
-
-          if (
-            cheating["tengok"] > 20 ||
-            cheating["depanBelakang"] > 20 ||
-            cheating["atasBawah"] > 20
-          ) {
+          if (checkThresholds()) {
             setMenyontek(true);
           }
         }
@@ -91,6 +128,7 @@ function DetectPage() {
         setError("Terjadi kesalahan dalam respons dari backend.");
       }
     } catch (error) {
+      setLoading(false);
       setError("Terjadi kesalahan saat mengirim video ke backend.");
       console.error(error);
     }
@@ -125,26 +163,21 @@ function DetectPage() {
       <div className="flex">
         <div className="w-2/3">
           <Webcam ref={webcamRef} className="videoCapture" />
+          {loading && <p>Loading...</p>}
         </div>
         <div className="flex-1 ml-5">
           {countCheat ? (
             <div>
               <p>Jumlah terdeteksi melakukan kecurangan</p>
               <ul>
-                <li>
-                  Tengok Kiri-Kanan: <b>{countCheat["tengok"]}</b> (deteksi
-                  tertinggi: {Number(countCheat["tengokPersen"]).toFixed(2)}%)
-                </li>
-                <li>
-                  Tengok Depan Belakang: <b>{countCheat["depanBelakang"]}</b>{" "}
-                  (deteksi tertinggi:{" "}
-                  {Number(countCheat["depanBelakangPersen"]).toFixed(2)}%)
-                </li>
-                <li>
-                  Lihat Atas Bawah: <b>{countCheat["atasBawah"]}</b> (deteksi
-                  tertinggi: {Number(countCheat["atasBawahPersen"]).toFixed(2)}
-                  %)
-                </li>
+                {dataDetect.map((data, index) => (
+                  <li key={index}>
+                    {data.label}: <b>{countCheat[`${data.name}`]}</b> (deteksi
+                    tertinggi:{" "}
+                    {Number(countCheat[`${data.name}-persen`]).toFixed(2)}%){" "}
+                    {thresholdsFromIntro[`${data.name}`]}
+                  </li>
+                ))}
                 <li>
                   Kesimpulan: <b>{menyontek ? "Menyontek" : "Normal"}</b>
                 </li>

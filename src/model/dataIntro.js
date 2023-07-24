@@ -15,19 +15,19 @@ const dataIntro = [
       {
         id: 1,
         category: "Tengok Kiri-Kanan",
-        url: "1-kategori-lirik-kiri-kanan.jpg",
+        url: "1-kategori-tengok-kiri-kanan.jpg",
       },
       {
         id: 2,
-        category: "Tengok Depan-Belakang",
+        category: "Tengok Depan",
         url: "2-kategori-tengok-depan-belakang.jpg",
       },
-      {
-        id: 3,
-        category: "Lirik Kiri-Kanan",
-        url: "3-kategori-tengok-kiri-kanan.jpg",
-      },
-      { id: 4, category: "Lihat Atas", url: "4-kategori-lihat-atas.jpg" },
+      { id: 3, category: "Lihat Atas", url: "3-kategori-lihat-atas.jpg" },
+      // {
+      //   id: 4,
+      //   category: "Lirik Kiri-Kanan",
+      //   url: "4-kategori-lirik-kiri-kanan.jpg",
+      // },
     ],
   },
   {
@@ -42,19 +42,19 @@ const dataIntro = [
         name: "tengok-kiri-kanan",
         threshold: 0,
       },
-      { id: 2, label: "Lihat Atas", name: "lihat-atas", threshold: 0 },
+      { id: 2, label: "Tengok Depan", name: "tengok-depan", threshold: 0 },
       {
         id: 3,
-        label: "Lihat Kiri-Kanan",
-        name: "lihat-kiri-kanan",
+        label: "Lihat Atas",
+        name: "lihat-atas",
         threshold: 0,
       },
-      {
-        id: 4,
-        label: "Tengok Depan-Belakang",
-        name: "tengok-depan-belakang",
-        threshold: 0,
-      },
+      // {
+      //   id: 3,
+      //   label: "Lirik Kiri-Kanan",
+      //   name: "lirik-kiri-kanan",
+      //   threshold: 0,
+      // },
     ],
   },
 ];

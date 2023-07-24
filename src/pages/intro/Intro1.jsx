@@ -9,7 +9,7 @@ const Intro1 = ({ title, content }) => {
           <h1 className="text-5xl">{title}</h1>
           <ul className="list-decimal text-lg ml-5">
             {content.map((data) => (
-              <li>{data.list}</li>
+              <li key={data.id}>{data.list}</li>
             ))}
           </ul>
         </div>
