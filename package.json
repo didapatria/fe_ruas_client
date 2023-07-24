@@ -1,5 +1,10 @@
 {
   "name": "fe_ruas_client",
+  "main": "index.js",
+  "repository": "https://github.com/didapatria/fe_ruas_client",
+  "author": "didapatria <didapatria3@gmail.com>",
+  "description": "Ruas (Ruang Pengawas) Ujian - Client: A React app that leverages the power of React JS, Tailwind CSS, and Tensorflow JS. Experience seamless user experiences with Ruas Ujian - Client! 💻",
+  "license": "MIT",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
