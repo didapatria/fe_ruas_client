@@ -25,20 +25,13 @@ function DetectPage() {
       thresholdsFromIntro.every((threshold) => typeof threshold === "number");
 
     // Threshold
-    console.log("Threshold: ", thresholdsFromIntro);
+    // console.log("Threshold: ", thresholdsFromIntro);
 
     if (!isValidThresholds) {
       setError("Invalid thresholds received from the Intro3 component.");
       return;
     }
-
-    // Update the menyontek state whenever thresholdsFromIntro changes
-    if (checkThresholds()) {
-      setMenyontek(true);
-    } else {
-      setMenyontek(false);
-    }
-  }, [countCheat, thresholdsFromIntro]);
+  }, [thresholdsFromIntro]);
 
   useEffect(() => {
     let model;
@@ -53,8 +46,15 @@ function DetectPage() {
 
     async function processVideo() {
       try {
+        // Pastikan webcamRef.current tidak bernilai null
+        if (!webcamRef.current) return;
+
         // Mengambil frame dari webcam
         const video = webcamRef.current.video;
+
+        // Pastikan video tidak null dan sudah siap
+        if (!video || video.readyState !== 4) return;
+
         const image = tf.browser.fromPixels(video);
         const predictions = await model.estimateFaces(image, false, true);
 
@@ -81,22 +81,10 @@ function DetectPage() {
     };
   }, []);
 
-  const checkThresholds = () => {
-    const values = dataDetect.map((data) => countCheat[`${data.name}`]);
-
-    // Menghasilkan array baru dengan hasil perbandingan terhadap ambang batas
-    const results = values.map(
-      (value, index) => value > thresholdsFromIntro[index]
-    );
-
-    return results;
-  };
-
   const sendVideoToBackend = async () => {
     try {
       setLoading(true);
       setError(null);
-      setMenyontek(false);
 
       const video = webcamRef.current.getScreenshot();
       const formData = new FormData();
@@ -119,9 +107,15 @@ function DetectPage() {
         console.log("logs: ", response.data.faces);
         if (response.data.faces[0]) {
           setCountCheat(response.data.faces[0].count_cheat);
-          if (checkThresholds()) {
-            setMenyontek(true);
-          }
+          console.log(response.data.faces[0].count_cheat);
+
+          const cheating = response.data.faces[0].count_cheat;
+
+          dataDetect.forEach((data) => {
+            if (cheating[data.name] > thresholdsFromIntro[data.name]) {
+              setMenyontek(true);
+            }
+          });
         }
         setError(null);
       } else {
@@ -161,27 +155,51 @@ function DetectPage() {
         </div>
       </nav>
       <div className="flex">
-        <div className="w-2/3">
-          <Webcam ref={webcamRef} className="videoCapture" />
-          {loading && <p>Loading...</p>}
+        <div className="w-1/2 relative flex items-center">
+          <Webcam ref={webcamRef} className="videoCapture w-3/4 rounded-3xl" />
+          {loading && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="w-fit h-fit text-white text-opacity-25 text-9xl animate-spin">
+                .
+              </p>
+            </div>
+          )}
         </div>
         <div className="flex-1 ml-5">
           {countCheat ? (
             <div>
               <p>Jumlah terdeteksi melakukan kecurangan</p>
-              <ul>
-                {dataDetect.map((data, index) => (
-                  <li key={index}>
-                    {data.label}: <b>{countCheat[`${data.name}`]}</b> (deteksi
-                    tertinggi:{" "}
-                    {Number(countCheat[`${data.name}-persen`]).toFixed(2)}%){" "}
-                    {thresholdsFromIntro[`${data.name}`]}
-                  </li>
-                ))}
-                <li>
-                  Kesimpulan: <b>{menyontek ? "Menyontek" : "Normal"}</b>
-                </li>
-              </ul>
+              <table width="100%" className="mt-10">
+                <thead>
+                  <tr>
+                    <td>Kategori Deteksi</td>
+                    <td>Threshold</td>
+                    <td>Jumlah Terdeteksi</td>
+                    <td>Akurasi Tertinggi</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  {dataDetect.map((data, index) => (
+                    <tr key={index}>
+                      <td>{data.label}</td>
+                      <td>{thresholdsFromIntro[`${data.name}`]}</td>
+                      <td>{countCheat[`${data.name}`]}</td>
+                      <td>
+                        {Number(countCheat[`${data.name}Persen`])
+                          ? Number(countCheat[`${data.name}Persen`]).toFixed(2)
+                          : ""}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colSpan="4">
+                      Kesimpulan: {menyontek ? "Menyontek" : "Normal"}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
             </div>
           ) : (
             ""

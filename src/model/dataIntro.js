@@ -12,17 +12,17 @@ const dataIntro = [
     title: "Daftar Kategori Deteksi",
     subtitle: "Terdapat 4 jenis kategori yang akan dideteksi",
     img: [
-      {
-        id: 1,
-        category: "Tengok Kiri-Kanan",
-        url: "1-kategori-tengok-kiri-kanan.jpg",
-      },
+      { id: 1, category: "Lihat Atas", url: "1-kategori-lihat-atas.jpg" },
       {
         id: 2,
-        category: "Tengok Depan",
-        url: "2-kategori-tengok-depan-belakang.jpg",
+        category: "Lihat Depan",
+        url: "2-kategori-lihat-depan.jpg",
       },
-      { id: 3, category: "Lihat Atas", url: "3-kategori-lihat-atas.jpg" },
+      {
+        id: 3,
+        category: "Tengok Kiri-Kanan",
+        url: "3-kategori-tengok-kiri-kanan.jpg",
+      },
       // {
       //   id: 4,
       //   category: "Lirik Kiri-Kanan",
@@ -38,15 +38,21 @@ const dataIntro = [
     content: [
       {
         id: 1,
-        label: "Tengok Kiri-Kanan",
-        name: "tengok-kiri-kanan",
+        label: "Lihat Atas",
+        name: "lihatAtas",
         threshold: 0,
       },
-      { id: 2, label: "Tengok Depan", name: "tengok-depan", threshold: 0 },
+      { id: 2, label: "Lihat Depan", name: "lihatDepan", threshold: 0 },
       {
         id: 3,
-        label: "Lihat Atas",
-        name: "lihat-atas",
+        label: "Tengok Kiri-Kanan",
+        name: "tengokKiriKanan",
+        threshold: 0,
+      },
+      {
+        id: 4,
+        label: "Normal",
+        name: "normal",
         threshold: 0,
       },
       // {
