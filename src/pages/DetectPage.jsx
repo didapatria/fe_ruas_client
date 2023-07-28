@@ -41,7 +41,7 @@ function DetectPage() {
       model = await load();
 
       // Memulai proses deteksi wajah secara berulang setiap 1s
-      setInterval(processVideo, 1000);
+      setInterval(processVideo, 2000);
     }
 
     async function processVideo() {
@@ -62,8 +62,17 @@ function DetectPage() {
 
         if (isFaceDetected && !faceDetected) {
           // Mengirim video ke backend hanya saat wajah pertama kali terdeteksi
-          sendVideoToBackend();
+          sendVideoToBackend(
+            predictions[0].topLeft[0],
+            predictions[0].bottomRight[0]
+          );
+          // console.log("predictions topLeft: ", predictions[0].topLeft[0]);
+          // console.log(
+          //   "predictions bottomRight: ",
+          //   predictions[0].bottomRight[0]
+          // );
         }
+        // sendVideoToBackend();
 
         setFaceDetected(isFaceDetected);
         setError(null);
@@ -81,7 +90,7 @@ function DetectPage() {
     };
   }, []);
 
-  const sendVideoToBackend = async () => {
+  const sendVideoToBackend = async (x, y) => {
     try {
       setLoading(true);
       setError(null);
@@ -89,6 +98,12 @@ function DetectPage() {
       const video = webcamRef.current.getScreenshot();
       const formData = new FormData();
       formData.append("video", dataURItoBlob(video));
+      formData.append("x", x);
+      formData.append("y", y);
+
+      for (var data of formData) {
+        console.log(data);
+      }
 
       const response = await axios.post(
         "http://127.0.0.1:5000/process-video",
