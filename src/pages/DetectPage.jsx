@@ -1,10 +1,11 @@
+import { useDispatch, useSelector } from "react-redux";
 import { useRef, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import Webcam from "react-webcam";
-import * as tf from "@tensorflow/tfjs";
+import { updateOrCreate } from "../slices/postSlice";
 import { load } from "@tensorflow-models/blazeface";
+import * as tf from "@tensorflow/tfjs";
+import Webcam from "react-webcam";
 import axios from "axios";
-import dataDetect from "../model/dataDetect";
+import Navbar from "../components/Navbar";
 
 function DetectPage() {
   const webcamRef = useRef(null);
@@ -12,26 +13,12 @@ function DetectPage() {
   const [faceCoordinates, setFaceCoordinates] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [menyontek, setMenyontek] = useState(false);
   const [countCheat, setCountCheat] = useState([]);
 
-  const location = useLocation();
-  const thresholdsFromIntro = location.state;
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    const isValidThresholds =
-      Array.isArray(thresholdsFromIntro) &&
-      thresholdsFromIntro.length === 4 &&
-      thresholdsFromIntro.every((threshold) => typeof threshold === "number");
-
-    // Threshold
-    // console.log("Threshold: ", thresholdsFromIntro);
-
-    if (!isValidThresholds) {
-      setError("Invalid thresholds received from the Intro3 component.");
-      return;
-    }
-  }, [thresholdsFromIntro]);
+  const { user } = useSelector((state) => state.auth);
+  const userId = user.nrpNim;
 
   useEffect(() => {
     let model;
@@ -40,8 +27,8 @@ function DetectPage() {
       // Memuat model BlazeFace dari TensorFlow.js
       model = await load();
 
-      // Memulai proses deteksi wajah secara berulang setiap 1s
-      setInterval(processVideo, 2000);
+      // Memulai proses deteksi wajah secara berulang setiap 2s
+      setInterval(processVideo, 2000); // 2 detik
     }
 
     async function processVideo() {
@@ -66,13 +53,7 @@ function DetectPage() {
             predictions[0].topLeft[0],
             predictions[0].bottomRight[0]
           );
-          // console.log("predictions topLeft: ", predictions[0].topLeft[0]);
-          // console.log(
-          //   "predictions bottomRight: ",
-          //   predictions[0].bottomRight[0]
-          // );
         }
-        // sendVideoToBackend();
 
         setFaceDetected(isFaceDetected);
         setError(null);
@@ -90,6 +71,7 @@ function DetectPage() {
     };
   }, []);
 
+  // Fungsi untuk mengirim video ke backend
   const sendVideoToBackend = async (x, y) => {
     try {
       setLoading(true);
@@ -100,10 +82,7 @@ function DetectPage() {
       formData.append("video", dataURItoBlob(video));
       formData.append("x", x);
       formData.append("y", y);
-
-      for (var data of formData) {
-        console.log(data);
-      }
+      formData.append("userId", userId);
 
       const response = await axios.post(
         "http://127.0.0.1:5000/process-video",
@@ -119,18 +98,19 @@ function DetectPage() {
 
       if (response && response.data && response.data.faces) {
         setFaceCoordinates(response.data.faces);
-        console.log("logs: ", response.data.faces);
         if (response.data.faces[0]) {
-          setCountCheat(response.data.faces[0].count_cheat);
-          console.log(response.data.faces[0].count_cheat);
+          countDetect(
+            response.data.faces[0].category,
+            response.data.faces[0].classification_percentage
+          );
 
-          const cheating = response.data.faces[0].count_cheat;
-
-          dataDetect.forEach((data) => {
-            if (cheating[data.name] > thresholdsFromIntro[data.name]) {
-              setMenyontek(true);
-            }
+          setCountCheat({
+            ...countCheat,
+            count: countCheat["count"],
+            percent: countCheat["highest"],
           });
+
+          sendToDatabase(response.data.faces[0]);
         }
         setError(null);
       } else {
@@ -143,6 +123,7 @@ function DetectPage() {
     }
   };
 
+  // Function to convert dataURI to Blob
   const dataURItoBlob = (dataURI) => {
     if (!dataURI) {
       return null;
@@ -160,94 +141,112 @@ function DetectPage() {
     return new Blob([arrayBuffer], { type: mimeString });
   };
 
+  class count_deteksi {
+    constructor() {
+      this.count = 0;
+      this.highest = 0;
+    }
+  }
+
+  const countNormal = new count_deteksi();
+  const countLihatAtas = new count_deteksi();
+  const countLihatDepan = new count_deteksi();
+  const countTengokKiriKanan = new count_deteksi();
+
+  // Fungsi untuk menghitung persentase
+  function countDetect(label, persentase) {
+    if (label === "menyontek-lihat-atas") {
+      if (countLihatAtas.highest < persentase) {
+        countLihatAtas.highest = persentase;
+        return countLihatAtas.highest;
+      }
+      countLihatAtas.count += 1;
+      return countLihatAtas.count;
+    } else if (label === "menyontek-lihat-depan") {
+      if (countLihatDepan.highest < persentase) {
+        countLihatDepan.highest = persentase;
+        return countLihatDepan.highest;
+      }
+      countLihatDepan.count += 1;
+      return countLihatDepan.count;
+    } else if (label === "menyontek-tengok-kiri-kanan") {
+      if (countTengokKiriKanan.highest < persentase) {
+        countTengokKiriKanan.highest = persentase;
+        return countTengokKiriKanan.highest;
+      }
+      countTengokKiriKanan.count += 1;
+      return countTengokKiriKanan.count;
+    } else if (label === "normal") {
+      if (countNormal.highest < persentase) {
+        countNormal.highest = persentase;
+        return countNormal.highest;
+      }
+      countNormal.count += 1;
+      return countNormal.count;
+    }
+  }
+
+  // Fungsi untuk mengirim data ke database
+  const sendToDatabase = async () => {
+    dispatch(
+      updateOrCreate({
+        path: `cheat/${userId}`,
+        data: {
+          timestamp: Date.now(),
+          lihat_atas: countLihatAtas,
+          lihat_depan: countLihatDepan,
+          tengok_kiri_kanan: countTengokKiriKanan,
+          normal: countNormal,
+          userId: userId,
+        },
+      })
+    );
+  };
+
   return (
     <div>
-      <nav className="bg-gray-800 p-4 w-full">
-        <div className="container mx-auto flex items-center justify-between">
-          <div className="text-white font-bold text-xl">
-            Ruas (Ruang Pengawas) Ujian - Client
+      <Navbar />
+      <div className="container mx-auto relative h-[calc(100vh_-_72px)] flex items-center justify-center">
+        <div>
+          <div className="w-[1/2] relative mx-auto">
+            <Webcam ref={webcamRef} className="videoCapture w-full" />
+            {loading && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <p className="w-fit h-fit text-white text-opacity-25 text-9xl animate-spin">
+                  .
+                </p>
+              </div>
+            )}
+            {faceCoordinates.map((face, index) => (
+              <div
+                key={index}
+                style={{
+                  position: "absolute",
+                  border: "2px solid red",
+                  left: face.border_coordinates.x1,
+                  top: face.border_coordinates.y1,
+                  width:
+                    face.border_coordinates.x2 - face.border_coordinates.x1,
+                  height:
+                    face.border_coordinates.y2 - face.border_coordinates.y1,
+                }}
+              >
+                <p
+                  style={{
+                    margin: 0,
+                    background: "red",
+                    color: "white",
+                    fontSize: "12px",
+                  }}
+                >
+                  {face.category} {face.classification_percentage}
+                </p>
+              </div>
+            ))}
           </div>
-        </div>
-      </nav>
-      <div className="flex">
-        <div className="w-1/2 relative flex items-center">
-          <Webcam ref={webcamRef} className="videoCapture w-3/4 rounded-3xl" />
-          {loading && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <p className="w-fit h-fit text-white text-opacity-25 text-9xl animate-spin">
-                .
-              </p>
-            </div>
-          )}
-        </div>
-        <div className="flex-1 ml-5">
-          {countCheat ? (
-            <div>
-              <p>Jumlah terdeteksi melakukan kecurangan</p>
-              <table width="100%" className="mt-10">
-                <thead>
-                  <tr>
-                    <td>Kategori Deteksi</td>
-                    <td>Threshold</td>
-                    <td>Jumlah Terdeteksi</td>
-                    <td>Akurasi Tertinggi</td>
-                  </tr>
-                </thead>
-                <tbody>
-                  {dataDetect.map((data, index) => (
-                    <tr key={index}>
-                      <td>{data.label}</td>
-                      <td>{thresholdsFromIntro[`${data.name}`]}</td>
-                      <td>{countCheat[`${data.name}`]}</td>
-                      <td>
-                        {Number(countCheat[`${data.name}Persen`])
-                          ? Number(countCheat[`${data.name}Persen`]).toFixed(2)
-                          : ""}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td colSpan="4">
-                      Kesimpulan: {menyontek ? "Menyontek" : "Normal"}
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
-          ) : (
-            ""
-          )}
+          {error ? <p className="mt-5 text-center">{error}</p> : null}
         </div>
       </div>
-
-      {faceCoordinates.map((face, index) => (
-        <div
-          key={index}
-          style={{
-            position: "absolute",
-            border: "2px solid red",
-            left: face.border_coordinates.x1,
-            top: face.border_coordinates.y1,
-            width: face.border_coordinates.x2 - face.border_coordinates.x1,
-            height: face.border_coordinates.y2 - face.border_coordinates.y1,
-          }}
-        >
-          <p
-            style={{
-              margin: 0,
-              background: "red",
-              color: "white",
-              fontSize: "12px",
-            }}
-          >
-            {face.category} {face.classification_percentage}
-          </p>
-        </div>
-      ))}
-
-      {error && <p>{error}</p>}
     </div>
   );
 }

@@ -3,7 +3,6 @@ import { useState } from "react";
 import Dots from "../../components/Dots";
 import Intro1 from "./Intro1";
 import Intro2 from "./Intro2";
-import Intro3 from "./Intro3";
 
 import dataIntro from "../../model/dataIntro";
 
@@ -18,25 +17,22 @@ const Intro = () => {
         {dataIntro.map((data) => (
           <div
             key={data.id}
-            className={step === data.id ? "flex w-full" : "hidden"}
+            className={step === data.id ? "flex w-full h-full" : "hidden"}
           >
             {step === data.id && (
               <>
                 {data.id === 1 && (
-                  <Intro1 title={data.title} content={data.content} />
+                  <Intro1
+                    title={data.title}
+                    content={data.content}
+                    toggleStep={toggleStep}
+                  />
                 )}
                 {data.id === 2 && (
                   <Intro2
                     title={data.title}
                     subtitle={data.subtitle}
                     img={data.img}
-                  />
-                )}
-                {data.id === 3 && (
-                  <Intro3
-                    title={data.title}
-                    subtitle={data.subtitle}
-                    content={data.content}
                   />
                 )}
               </>
